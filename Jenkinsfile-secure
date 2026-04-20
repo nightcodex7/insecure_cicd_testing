@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    
+    environment {
+        DB_PASSWORD = credentials('db-password-id')
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                dir('secure-app') {
+                    sh 'docker build -t secure-app .'
+                }
+            }
+        }
+
+        stage('Run') {
+            steps {
+                sh '''
+                docker run --rm \
+                -e DB_PASSWORD=$DB_PASSWORD \
+                secure-app
+                '''
+            }
+        }
+    }
+}
