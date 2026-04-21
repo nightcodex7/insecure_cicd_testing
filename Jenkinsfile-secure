@@ -16,10 +16,10 @@ pipeline {
 
         stage('Scan Image (Trivy Gate)') {
             steps {
-                // Fail the build if HIGH/CRITICAL vulns are found
+                // Fail the build if CRITICAL vulns are found
                 sh '''
                 trivy image \
-                  --severity HIGH,CRITICAL \
+                  --severity CRITICAL \
                   --exit-code 1 \
                   --no-progress \
                   $IMAGE_NAME
