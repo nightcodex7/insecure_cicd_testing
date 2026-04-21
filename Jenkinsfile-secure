@@ -7,6 +7,7 @@ pipeline {
     }
 
     stages {
+
         stage('Cleanup Old Containers') {
             steps {
                 sh 'docker rm -f nginx-demo || true'
@@ -21,7 +22,6 @@ pipeline {
 
         stage('Scan Image (Trivy Gate)') {
             steps {
-                // Fail the build if CRITICAL vulns are found
                 sh '''
                 trivy image \
                   --severity CRITICAL \
@@ -35,7 +35,10 @@ pipeline {
         stage('Run Image (Only if Scan Passes)') {
             steps {
                 sh '''
-                docker run -d -p 8080:80 $IMAGE_NAME
+                docker run -d \
+                -p 8081:80 \
+                --name nginx-demo \
+                $IMAGE_NAME
                 '''
             }
         }
