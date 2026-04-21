@@ -7,6 +7,11 @@ pipeline {
     }
 
     stages {
+        stage('Cleanup Old Containers') {
+            steps {
+                sh 'docker rm -f nginx-demo || true'
+            }
+        }
 
         stage('Pull Image (Untrusted Source)') {
             steps {
