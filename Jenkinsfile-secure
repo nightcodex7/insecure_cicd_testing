@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DB_PASSWORD = credentials('db-password-id')
-        IMAGE_NAME  = 'nginx:latest'   // simulate third-party image
+        IMAGE_NAME  = 'node:13'   // simulate third-party image
     }
 
     stages {
