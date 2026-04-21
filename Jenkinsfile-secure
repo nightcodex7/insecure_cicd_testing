@@ -39,7 +39,7 @@ pipeline {
                 sh '''
                 docker scout cves $IMAGE_NAME \
                 --only-severity critical \
-                --exit-code 1
+                --exit-code
                 '''
             }
         }
