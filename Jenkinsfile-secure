@@ -14,20 +14,24 @@ pipeline {
             }
         }
 
+        stage('Docker Login (Required for Scout)') {
+            steps {
+                sh 'docker login -u $DOCKER_USER -p $DOCKER_PASS || true'
+            }
+        }
+
         stage('Pull Image (Untrusted Source)') {
             steps {
                 sh 'docker pull $IMAGE_NAME'
             }
         }
 
-        stage('Scan Image (Trivy Gate)') {
+        stage('Scan Image (Docker Scout)') {
             steps {
                 sh '''
-                trivy image \
-                  --severity CRITICAL \
-                  --exit-code 1 \
-                  --no-progress \
-                  $IMAGE_NAME
+                docker scout cves $IMAGE_NAME \
+                --only-severity critical \
+                --exit-code 1
                 '''
             }
         }
