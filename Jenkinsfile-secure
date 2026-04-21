@@ -1,25 +1,36 @@
 pipeline {
     agent any
-    
+
     environment {
         DB_PASSWORD = credentials('db-password-id')
+        IMAGE_NAME  = 'nginx:latest'   // simulate third-party image
     }
 
     stages {
-        stage('Build') {
+
+        stage('Pull Image (Untrusted Source)') {
             steps {
-                dir('secure-app') {
-                    sh 'docker build -t secure-app .'
-                }
+                sh 'docker pull $IMAGE_NAME'
             }
         }
 
-        stage('Run') {
+        stage('Scan Image (Trivy Gate)') {
+            steps {
+                // Fail the build if HIGH/CRITICAL vulns are found
+                sh '''
+                trivy image \
+                  --severity HIGH,CRITICAL \
+                  --exit-code 1 \
+                  --no-progress \
+                  $IMAGE_NAME
+                '''
+            }
+        }
+
+        stage('Run Image (Only if Scan Passes)') {
             steps {
                 sh '''
-                docker run --rm \
-                -e DB_PASSWORD=$DB_PASSWORD \
-                secure-app
+                docker run -d -p 8080:80 $IMAGE_NAME
                 '''
             }
         }
